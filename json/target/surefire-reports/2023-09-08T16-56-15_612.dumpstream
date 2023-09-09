@@ -1,0 +1,4 @@
+# Created at 2023-09-08T16:56:16.149
+Boot Manifest-JAR contains absolute paths in classpath 'D:\Travail\Workspace\Impact-JSON\json\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+
