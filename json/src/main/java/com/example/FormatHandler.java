@@ -2,26 +2,20 @@ package com.example;
 
 import java.util.Locale;
 
+// TODO Ajouter une interface et tester les fonctions
 public class FormatHandler {
 
     // Fonction pour vérifier si la valeur est au format d'heure correct
     public static boolean isTimeFormatValid(String timeString) {
-        String timePattern = "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$";
-        return timeString.matches(timePattern);
+        return timeString.matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$");
     }
 
-    // Fonction pour convertir degrés, minutes, secondes (DMS) en degrés décimaux
-    // (DD)
+    // Fonction pour (DMS) en (DD)
     public static double convertDMSToDD(String dmsValue) {
-        // Utilisation d'une expression régulière pour extraire les chiffres, les points
-        // et le signe négatif
         String[] parts = dmsValue.split("[^0-9.-]+");
-
-        // Vérification du nombre de parties pour s'assurer de la présence des
-        // composants DMS
         if (parts.length < 3) {
             throw new IllegalArgumentException(
-                    "La chaîne DMS doit contenir des composants de degrés, minutes et secondes.");
+                    "La chaîne DMS doit contenir des degrés, minutes et secondes. :( ");
         }
 
         // Conversion des parties en double
@@ -35,28 +29,45 @@ public class FormatHandler {
         return ddValue;
     }
 
-    // Fonction pour convertir degrés décimaux (DD) en degrés, minutes, secondes
-    // (DMS)
+    // Fonction pour convertir (DD) en (DMS)
     public static String convertDDtoDMS(double ddValue) {
         int degrees = (int) Math.abs(ddValue);
         double minutesDouble = (Math.abs(ddValue) - degrees) * 60;
         int minutes = (int) minutesDouble;
         double seconds = (minutesDouble - minutes) * 60;
 
-        // Ajouter le signe négatif au degré si nécessaire
+        // Ajouter le signe négatif au degré si besoin
         String degreeSign = (ddValue < 0) ? "-" : "";
 
-        // Format seconds with a period (.) as the decimal separator
+        // Formatte les secondes
         String dmsValue = String.format(Locale.US, "%s%d°%d'%f''", degreeSign, degrees, minutes, seconds);
 
-        // Remplace les virgules par des points pour le séparateur décimal
+        // Remplace les virgules par des points
         dmsValue = dmsValue.replace(",", ".");
 
         return dmsValue;
     }
 
-    public static boolean isNMEAFormatValid(String nmeaValue) {
-        // Condition pour accepter les valeurs NMEA avec une lettre à la fin
-        return nmeaValue.matches("^\\$[A-Z]+,[0-9.]+,[0-9.]+\\*[0-9A-Fa-f]{2}[A-Za-z]$");
+    // TODO Simplifier la fonction
+    public static boolean isNMEAFormatValid(String input) {
+        if (input == null || input.isEmpty() || !input.startsWith("$") || input.length() < 7) {
+            return false;
+        }
+
+        // Extrait la somme de contrôle hexadécimale (2 caractères) du message NMEA
+        String checksum = input.substring(input.lastIndexOf('*') + 1);
+
+        // Vérifie si la somme de contrôle est au format hexadécimal
+        try {
+            int checksumValue = Integer.parseInt(checksum, 16);
+            String sentenceWithoutChecksum = input.substring(1, input.lastIndexOf('*'));
+            int calculatedChecksum = 0;
+            for (char c : sentenceWithoutChecksum.toCharArray()) {
+                calculatedChecksum ^= c;
+            }
+            return checksumValue == calculatedChecksum;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

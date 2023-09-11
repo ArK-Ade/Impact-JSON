@@ -13,7 +13,9 @@ import org.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+// TODO Ajouter une interface et tester les fonctions
 public class JsonManager {
+    // TODO enlever certains attributs
     private String sourceUrl;
     private String targetUrl;
     private JSONObject originalJson;
@@ -121,41 +123,32 @@ public class JsonManager {
         // Le JSON récupéré depuis l'URL source
         String jsonFromSource = response.toString();
 
-        // Analyser le JSON d'origine
         originalJson = new JSONObject(jsonFromSource);
         originalItems = originalJson.getJSONArray("items");
     }
 
     public void transformJSON() {
-        // Créer un nouveau JSON avec le format souhaité
-        JSONObject newJson = new JSONObject();
-
         JSONArray newItems = new JSONArray();
         for (int i = 0; i < originalItems.length(); i++) {
             JSONObject originalItem = originalItems.getJSONObject(i);
             JSONObject newItem = new JSONObject();
             newItem.put("id", originalItem.getInt("id"));
 
-            // Modifier la valeur selon les besoins
             if (originalItem.getString("subject").equals("km->m")) {
                 double value = originalItem.getDouble("value") * 1000;
                 DecimalFormat decimalFormat = new DecimalFormat("#.######");
                 String formattedValue = decimalFormat.format(value);
-
                 formattedValue = formattedValue.replace(',', '.');
                 double valeurDouble = Double.parseDouble(formattedValue);
                 newItem.put("value", Double.valueOf(valeurDouble));
             } else if (originalItem.getString("subject").equals("hour")) {
                 String originalValue = originalItem.getString("value");
                 boolean isTimeFormatValid = FormatHandler.isTimeFormatValid(originalValue);
-
-                // Modifier en fonction de la logique nécessaire
                 newItem.put("value", isTimeFormatValid);
             } else if (originalItem.getString("subject").equals("m->km")) {
                 double value = originalItem.getDouble("value") / 1000;
                 DecimalFormat decimalFormat = new DecimalFormat("#.######");
                 String formattedValue = decimalFormat.format(value);
-
                 formattedValue = formattedValue.replace(',', '.');
                 double valeurDouble = Double.parseDouble(formattedValue);
                 newItem.put("value", Double.valueOf(valeurDouble));
@@ -163,7 +156,6 @@ public class JsonManager {
                 double value = originalItem.getDouble("value") * 1.852;
                 DecimalFormat decimalFormat = new DecimalFormat("#.######");
                 String formattedValue = decimalFormat.format(value);
-
                 formattedValue = formattedValue.replace(',', '.');
                 double valeurDouble = Double.parseDouble(formattedValue);
                 newItem.put("value", Double.valueOf(valeurDouble));
@@ -171,7 +163,6 @@ public class JsonManager {
                 double value = originalItem.getDouble("value") / 1.852;
                 DecimalFormat decimalFormat = new DecimalFormat("#.######");
                 String formattedValue = decimalFormat.format(value);
-
                 formattedValue = formattedValue.replace(',', '.');
                 double valeurDouble = Double.parseDouble(formattedValue);
                 newItem.put("value", Double.valueOf(valeurDouble));
@@ -198,15 +189,10 @@ public class JsonManager {
     }
 
     public void saveJSONToLocalFile(JSONObject jsonFile, String filePath) throws IOException {
-        // Créez un objet Gson avec une mise en forme d'indentation
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-        // Transformez le JSON en une chaîne JSON formatée avec indentation
         String formattedJson = gson.toJson(jsonFile);
 
-        // Sauvegardez la réponse JSON dans un fichier
         try (FileWriter fileWriter = new FileWriter(filePath)) {
-            // Écrivez la réponse JSON formatée dans le fichier
             fileWriter.write(formattedJson);
         }
 
