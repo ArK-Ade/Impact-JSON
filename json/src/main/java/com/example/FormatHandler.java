@@ -48,7 +48,7 @@ public class FormatHandler {
         return dmsValue;
     }
 
-    // TODO Simplifier la fonction
+    // TODO Simplifier la fonction 
     public static boolean isNMEAFormatValid(String input) {
         if (input == null || input.isEmpty() || !input.startsWith("$") || input.length() < 7) {
             return false;
